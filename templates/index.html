@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plastic Classifier</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 60px auto; padding: 0 20px; background: #f5f5f5; }
+    h1   { text-align: center; color: #333; }
+    .card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .upload-area {
+      border: 2px dashed #aaa; border-radius: 6px; padding: 30px;
+      text-align: center; cursor: pointer; color: #666; transition: border-color .2s;
+    }
+    .upload-area:hover { border-color: #4a90e2; }
+    #preview { max-width: 100%; max-height: 300px; margin: 16px auto; display: none; border-radius: 6px; }
+    button {
+      display: block; width: 100%; padding: 12px; margin-top: 16px;
+      background: #4a90e2; color: white; border: none; border-radius: 6px;
+      font-size: 16px; cursor: pointer;
+    }
+    button:hover { background: #357abd; }
+    #result { margin-top: 24px; display: none; }
+    #result h2 { margin: 0 0 6px; color: #222; }
+    #result .label { font-size: 28px; font-weight: bold; color: #4a90e2; }
+    #result .confidence { color: #666; margin-bottom: 16px; }
+    .bar-row { display: flex; align-items: center; margin: 5px 0; font-size: 14px; }
+    .bar-label { width: 55px; text-align: right; margin-right: 8px; color: #444; }
+    .bar-bg { flex: 1; background: #eee; border-radius: 4px; height: 14px; overflow: hidden; }
+    .bar-fill { height: 100%; background: #4a90e2; border-radius: 4px; transition: width .4s; }
+    .bar-pct { width: 44px; margin-left: 8px; color: #555; }
+    #error { color: red; margin-top: 12px; display: none; }
+  </style>
+</head>
+<body>
+  <h1>Plastic Classifier</h1>
+  <div class="card">
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+      Click to upload an image (JPG, PNG, etc.)
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" />
+    <img id="preview" alt="Preview" />
+    <button id="classifyBtn" style="display:none" onclick="classify()">Classify</button>
+    <div id="error"></div>
+    <div id="result">
+      <h2>Result</h2>
+      <div class="label" id="labelText"></div>
+      <div class="confidence" id="confText"></div>
+      <div id="bars"></div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const preview   = document.getElementById('preview');
+    const btn       = document.getElementById('classifyBtn');
+    const result    = document.getElementById('result');
+    const errorDiv  = document.getElementById('error');
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = 'block';
+      btn.style.display = 'block';
+      result.style.display = 'none';
+      errorDiv.style.display = 'none';
+    });
+
+    async function classify() {
+      const file = fileInput.files[0];
+      if (!file) return;
+      btn.textContent = 'Classifying…';
+      btn.disabled = true;
+      errorDiv.style.display = 'none';
+
+      const form = new FormData();
+      form.append('file', file);
+
+      try {
+        const res = await fetch('/predict', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        document.getElementById('labelText').textContent = data.label;
+        document.getElementById('confText').textContent  = `Confidence: ${data.confidence}%`;
+
+        const bars = document.getElementById('bars');
+        bars.innerHTML = '';
+        const sorted = Object.entries(data.all_probs).sort((a, b) => b[1] - a[1]);
+        sorted.forEach(([cls, pct]) => {
+          bars.innerHTML += `
+            <div class="bar-row">
+              <div class="bar-label">${cls}</div>
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+              <div class="bar-pct">${pct}%</div>
+            </div>`;
+        });
+
+        result.style.display = 'block';
+      } catch (e) {
+        errorDiv.textContent = e.message || 'Something went wrong.';
+        errorDiv.style.display = 'block';
+      } finally {
+        btn.textContent = 'Classify';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
