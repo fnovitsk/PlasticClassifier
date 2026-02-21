@@ -46,9 +46,6 @@ cd PlasticClassifier
 ```bash
 pip install -r requirements.txt
 ```
-
-> **Note:** If you have a CUDA-capable GPU, install the matching CUDA build of PyTorch from https://pytorch.org/get-started/locally/ for faster inference.
-
 ---
 
 ## Running the App
@@ -77,35 +74,6 @@ http://127.0.0.1:5000
 1. Click the upload area and select a plastic image (JPG, PNG, WEBP, etc.)
 2. Click **Classify**
 3. The predicted plastic type and a confidence bar chart for all classes are shown instantly
-
----
-
-## Re-training the Model
-
-Open `plastic_classifier_pytorch.ipynb` in VS Code or Jupyter and run all cells. The final cell saves new weights to `plastic_classifier.pth`.
-
----
-
-## Deploying Publicly (optional)
-
-To share the app over the internet you can deploy it to a free hosting platform:
-
-### Render
-1. Push the repository to GitHub.
-2. Create a new **Web Service** on [render.com](https://render.com), pointing at your repo.
-3. Set **Start Command** to `python app.py`.
-4. Render will install `requirements.txt` automatically.
-
-### Railway
-1. Push to GitHub.
-2. Create a new project on [railway.app](https://railway.app) and import the repo.
-3. Set the start command to `python app.py`.
-
-> For any public deployment, change the last line of `app.py` to:
-> ```python
-> app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-> ```
-> and add `import os` at the top.
 
 ---
 
