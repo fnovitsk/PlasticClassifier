@@ -1,6 +1,14 @@
 # Plastic Classifier
 
-A deep learning web app that classifies plastic images into one of seven categories using a fine-tuned ResNet-50 model trained with PyTorch.
+A deep learning web app that classifies plastic images into one of seven categories using a fine-tuned ResNet-50 model trained with PyTorch. Upload your own image to see its plastic type.
+
+## 🌐 Live Demo
+
+**[https://plasticclassifier.onrender.com/](https://plasticclassifier.onrender.com/)**
+
+![Demo](DemoImage.PNG)
+
+---
 
 ## Supported Plastic Types
 
@@ -21,6 +29,8 @@ A deep learning web app that classifies plastic images into one of seven categor
 ```
 PlasticClassifier/
 ├── app.py                          # Flask web application
+├── Dockerfile                      # Docker deployment config
+├── .dockerignore
 ├── plastic_classifier.pth          # Trained model weights
 ├── plastic_classifier_pytorch.ipynb # Training notebook
 ├── requirements.txt
@@ -33,7 +43,7 @@ PlasticClassifier/
 
 ---
 
-## Setup
+## Local Setup
 
 ### 1. Clone / open the project
 
@@ -46,58 +56,27 @@ cd PlasticClassifier
 ```bash
 pip install -r requirements.txt
 ```
+
 ---
 
-## Running the App
+## Running Locally
 
 ```bash
 python app.py
 ```
 
-You should see output similar to:
-
-```
- * Running on http://127.0.0.1:5000
- * Press CTRL+C to quit
-```
+Then open **http://127.0.0.1:5000** in your browser.
 
 ---
 
-## Accessing the Live Demo
-
-Open your browser and navigate to:
-
-```
-http://127.0.0.1:5000
-```
-
-1. Click the upload area and select a plastic image (JPG, PNG, WEBP, etc.)
-2. Click **Classify**
-3. The predicted plastic type and a confidence bar chart for all classes are shown instantly
-
----
-
-## Docker
-
-### Build and run locally
+## Running with Docker
 
 ```bash
 docker build -t plastic-classifier .
 docker run -p 5000:5000 plastic-classifier
 ```
 
-Then open http://localhost:5000.
-
-> The Docker image installs the **CPU-only** build of PyTorch, which is much smaller and works on any host (including Render's free tier which has no GPU).
-
-### Deploy to Render via Docker
-
-1. Push the repository to GitHub (make sure `plastic_classifier.pth` is committed).
-2. Go to [render.com](https://render.com) → **New → Web Service**.
-3. Connect your GitHub repo.
-4. Set **Environment** to **Docker** — Render will detect the `Dockerfile` automatically.
-5. Leave the start command blank (the `CMD` in the Dockerfile handles it).
-6. Click **Deploy**. Render will build the image and expose the app on a public URL.
+Then open **http://127.0.0.1:5000** in your browser.
 
 ---
 
@@ -106,3 +85,4 @@ Then open http://localhost:5000.
 - **Model:** ResNet-50 (pretrained on ImageNet, fine-tuned on plastic dataset)
 - **Framework:** PyTorch + torchvision
 - **Web:** Flask + plain HTML/CSS/JS
+- **Deployment:** Docker on Render
