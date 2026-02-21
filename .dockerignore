@@ -1,0 +1,9 @@
+Data/
+ExternalImages/
+*.ipynb
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+README.md
